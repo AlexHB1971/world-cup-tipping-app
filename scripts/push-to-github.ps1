@@ -1,5 +1,5 @@
 # Run after: gh auth login
-# Creates https://github.com/AlexHB1971/world-cup-predictions and pushes code
+# Creates https://github.com/AlexHB1971/world-cup-tipping-app and pushes code
 
 $ErrorActionPreference = "Stop"
 $env:Path = "C:\Program Files\Git\bin;C:\Program Files\GitHub CLI;" + $env:Path
@@ -12,7 +12,7 @@ if ($LASTEXITCODE -ne 0) {
   gh auth login
 }
 
-gh repo create AlexHB1971/world-cup-predictions --public --source=. --remote=origin --push
+gh repo create AlexHB1971/world-cup-tipping-app --public --source=. --remote=origin --push
 
 Write-Host ""
-Write-Host "Done: https://github.com/AlexHB1971/world-cup-predictions" -ForegroundColor Green
+Write-Host "Done: https://github.com/AlexHB1971/world-cup-tipping-app" -ForegroundColor Green

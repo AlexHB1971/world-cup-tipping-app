@@ -1,4 +1,4 @@
-# World Cup Predictions 2026
+# World Cup Tipping App 2026
 
 A web app for predicting FIFA World Cup 2026 match scores and tournament outcomes. Users register with email, earn points from match predictions, and compete on a public leaderboard.
 
