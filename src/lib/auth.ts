@@ -13,6 +13,13 @@ function getSecret() {
   return new TextEncoder().encode(secret);
 }
 
+// Set COOKIE_INSECURE=1 when serving over plain HTTP (e.g. an IP-only VPS
+// deploy with no TLS yet) so browsers actually send the session cookie back.
+function useSecureCookies() {
+  if (process.env.COOKIE_INSECURE === "1") return false;
+  return process.env.NODE_ENV === "production";
+}
+
 export async function hashPassword(password: string) {
   return bcrypt.hash(password, 10);
 }
@@ -31,7 +38,7 @@ export async function createSession(userId: string) {
   const cookieStore = await cookies();
   cookieStore.set(SESSION_COOKIE, token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: useSecureCookies(),
     sameSite: "lax",
     path: "/",
     maxAge: 60 * 60 * 24 * 30,
@@ -84,7 +91,7 @@ export async function createAdminSession() {
   const cookieStore = await cookies();
   cookieStore.set(ADMIN_COOKIE, token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: useSecureCookies(),
     sameSite: "lax",
     path: "/",
     maxAge: 60 * 60 * 24,
