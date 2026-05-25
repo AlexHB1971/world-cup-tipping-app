@@ -138,6 +138,22 @@ th {
   color: var(--muted);
 }
 
+.badge.fifa-live {
+  background: var(--danger);
+  color: white;
+  font-weight: 700;
+  animation: fifa-live-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes fifa-live-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .badge.fifa-live { animation: none; }
+}
+
 .grid-2 {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));

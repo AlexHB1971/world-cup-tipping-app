@@ -1,6 +1,13 @@
 import Link from "next/link";
 import { LiveRefresher } from "@/components/LiveRefresher";
 import { getCurrentUser } from "@/lib/auth";
+import {
+  fetchWorldCupMatches,
+  isFinished,
+  isLive,
+  pickRelevant,
+  prettyStage,
+} from "@/lib/football-data";
 import { computeLeaderboard } from "@/lib/leaderboard";
 import { prisma } from "@/lib/prisma";
 
@@ -19,7 +26,7 @@ function relativeTime(date: Date, now: Date): string {
 
 export default async function HomePage() {
   const now = new Date();
-  const [user, upcoming, recentResults, leaderboard] = await Promise.all([
+  const [user, upcoming, recentResults, leaderboard, fifa] = await Promise.all([
     getCurrentUser(),
     prisma.match.findMany({
       where: { kickoffAt: { gte: now } },
@@ -34,8 +41,10 @@ export default async function HomePage() {
       include: { homeTeam: true, awayTeam: true },
     }),
     computeLeaderboard(),
+    fetchWorldCupMatches(),
   ]);
   const topFive = leaderboard.slice(0, 5);
+  const fifaPicked = fifa.ok ? pickRelevant(fifa.matches, 6) : [];
 
   return (
     <>
@@ -93,6 +102,86 @@ export default async function HomePage() {
           </p>
         </section>
       </div>
+
+      <section className="card" style={{ marginTop: "2rem" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "baseline",
+            flexWrap: "wrap",
+            gap: "0.5rem",
+          }}
+        >
+          <h3 style={{ margin: 0 }}>
+            Live &amp; recent
+            <span
+              className="badge"
+              style={{ marginLeft: "0.5rem", verticalAlign: "middle" }}
+            >
+              FIFA
+            </span>
+          </h3>
+          <span style={{ color: "var(--muted)", fontSize: "0.85rem" }}>
+            via football-data.org
+          </span>
+        </div>
+        {!fifa.ok ? (
+          <p style={{ color: "var(--muted)", marginTop: "0.5rem" }}>
+            Live FIFA data unavailable: {fifa.error}
+          </p>
+        ) : fifaPicked.length === 0 ? (
+          <p style={{ color: "var(--muted)", marginTop: "0.5rem" }}>
+            No matches found.
+          </p>
+        ) : (
+          <ul style={{ listStyle: "none", padding: 0, margin: "0.5rem 0 0" }}>
+            {fifaPicked.map((m) => (
+              <li
+                key={m.id}
+                style={{
+                  padding: "0.6rem 0",
+                  borderBottom: "1px solid var(--border)",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  gap: "0.5rem",
+                  flexWrap: "wrap",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
+                  {isLive(m) ? (
+                    <span className="badge fifa-live">
+                      LIVE {m.minute != null ? `${m.minute}'` : ""}
+                    </span>
+                  ) : isFinished(m) ? (
+                    <span className="badge">FT</span>
+                  ) : (
+                    <span className="badge">{prettyStage(m.stage)}</span>
+                  )}
+                  <strong>{m.homeTeam.name}</strong>
+                  {isLive(m) || isFinished(m) ? (
+                    <span style={{ color: "var(--accent)", fontWeight: 700 }}>
+                      {m.score.fullTime.home}–{m.score.fullTime.away}
+                    </span>
+                  ) : (
+                    <span style={{ color: "var(--muted)" }}>vs</span>
+                  )}
+                  <strong>{m.awayTeam.name}</strong>
+                </div>
+                <div
+                  style={{
+                    color: "var(--muted)",
+                    fontSize: "0.85rem",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {new Date(m.utcDate).toLocaleString()}
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
 
       <h2 style={{ marginTop: "2rem" }}>
         Live
