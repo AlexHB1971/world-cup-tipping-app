@@ -63,9 +63,14 @@ export function AuthForm({ mode }: AuthFormProps) {
           name="password"
           type="password"
           required
-          minLength={6}
+          minLength={mode === "register" ? 8 : 1}
           autoComplete={mode === "login" ? "current-password" : "new-password"}
         />
+        {mode === "register" && (
+          <p style={{ color: "var(--muted)", fontSize: "0.8rem", marginTop: "0.25rem" }}>
+            At least 8 characters.
+          </p>
+        )}
       </div>
       {error && <div className="message error">{error}</div>}
       <button className="btn" type="submit" disabled={loading}>
