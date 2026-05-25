@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Nav } from "@/components/Nav";
+import { OracleWidget } from "@/components/OracleWidget";
 import { getCurrentUser } from "@/lib/auth";
 
 export const metadata: Metadata = {
@@ -28,6 +29,7 @@ export default async function RootLayout({
           <Nav user={user} />
           {children}
         </div>
+        {user && <OracleWidget />}
       </body>
     </html>
   );
