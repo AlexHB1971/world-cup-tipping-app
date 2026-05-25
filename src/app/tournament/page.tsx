@@ -1,10 +1,8 @@
 import { redirect } from "next/navigation";
-import { allBracketSlotCodes } from "@/data/knockout-bracket";
+import { filterRealTeams } from "@/data/knockout-bracket";
 import { TournamentPredictionForm } from "@/components/TournamentPredictionForm";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-
-const BRACKET_SLOT_CODES = new Set(allBracketSlotCodes());
 
 export default async function TournamentPage() {
   const user = await getCurrentUser();
@@ -26,9 +24,7 @@ export default async function TournamentPage() {
         champion.
       </p>
       <TournamentPredictionForm
-        teams={teams
-          .filter((t) => !BRACKET_SLOT_CODES.has(t.code))
-          .map((t) => t.name)}
+        teams={filterRealTeams(teams).map((t) => t.name)}
         initial={prediction}
         locked={locked}
       />

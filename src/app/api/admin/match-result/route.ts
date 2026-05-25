@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { isAdminRequest } from "@/lib/auth";
+import { isAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 export async function POST(request: Request) {
-  if (!isAdminRequest(request.headers.get("x-admin-secret"))) {
+  if (!(await isAdmin())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -12,8 +12,26 @@ export async function POST(request: Request) {
   const homeScore = Number(body.homeScore);
   const awayScore = Number(body.awayScore);
 
-  if (!matchId || Number.isNaN(homeScore) || Number.isNaN(awayScore)) {
-    return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
+  if (!matchId) {
+    return NextResponse.json({ error: "matchId required" }, { status: 400 });
+  }
+  if (
+    !Number.isInteger(homeScore) ||
+    !Number.isInteger(awayScore) ||
+    homeScore < 0 ||
+    awayScore < 0 ||
+    homeScore > 20 ||
+    awayScore > 20
+  ) {
+    return NextResponse.json(
+      { error: "Scores must be whole numbers between 0 and 20" },
+      { status: 400 }
+    );
+  }
+
+  const match = await prisma.match.findUnique({ where: { id: matchId } });
+  if (!match) {
+    return NextResponse.json({ error: "Match not found" }, { status: 404 });
   }
 
   await prisma.match.update({

@@ -17,7 +17,6 @@ export function Nav({ user }: NavProps) {
         )}
         <Link href="/format">Format</Link>
         <Link href="/leaderboard">Leaderboard</Link>
-        <Link href="/admin">Admin</Link>
         {user ? (
           <form action="/api/auth/logout" method="post">
             <button type="submit" className="btn secondary" style={{ padding: "0.35rem 0.75rem" }}>

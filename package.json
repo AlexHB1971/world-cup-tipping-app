@@ -8,7 +8,9 @@
     "start": "next start",
     "postinstall": "prisma generate",
     "db:push": "prisma db push",
-    "db:seed": "tsx prisma/seed.ts"
+    "db:migrate": "prisma migrate deploy",
+    "db:seed": "tsx prisma/seed.ts",
+    "test": "tsx src/lib/scoring.test.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.8.2",

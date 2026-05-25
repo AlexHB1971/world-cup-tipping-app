@@ -22,12 +22,14 @@ A web app for predicting FIFA World Cup 2026 match scores and tournament outcome
 
 ## Quick start
 
+You need a Postgres database. The simplest setup is a free Supabase project — see [DEPLOY.md](DEPLOY.md) for the 2-minute walkthrough — then:
+
 ```bash
-cd world-cup-predictions
-cp .env.example .env
+cd world-cup-tipping-app
+cp .env.example .env           # fill in Supabase URLs + secrets
 npm install
-npm run db:push
-npm run db:seed
+npm run db:push                # create schema in Supabase
+npm run db:seed                # load teams + fixtures
 npm run dev
 ```
 
@@ -42,5 +44,5 @@ Visit `/admin` and enter your `ADMIN_SECRET` to record real match and tournament
 ## Stack
 
 - Next.js 15 (App Router)
-- Prisma + SQLite
+- Prisma + Postgres (Supabase)
 - Email/password auth with HTTP-only session cookie

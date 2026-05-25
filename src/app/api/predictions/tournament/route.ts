@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { filterRealTeams } from "@/data/knockout-bracket";
 import { getSessionUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
@@ -40,7 +41,9 @@ export async function POST(request: Request) {
   }
 
   const teams = new Set(
-    (await prisma.team.findMany({ select: { name: true } })).map((t) => t.name)
+    filterRealTeams(
+      await prisma.team.findMany({ select: { name: true, code: true } })
+    ).map((t) => t.name)
   );
   for (const value of Object.values(data)) {
     if (!teams.has(value)) {

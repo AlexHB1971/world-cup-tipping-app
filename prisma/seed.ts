@@ -83,17 +83,27 @@ const GROUPS: Record<string, { name: string; code: string }[]> = {
   ],
 };
 
+/** Opening match of the 2026 World Cup. All fixtures are offsets from this date. */
+const TOURNAMENT_START = new Date("2026-06-11T18:00:00Z");
+
+function daysAfterStart(days: number, hourUTC: number): Date {
+  const d = new Date(TOURNAMENT_START);
+  d.setUTCDate(d.getUTCDate() + days);
+  d.setUTCHours(hourUTC, 0, 0, 0);
+  return d;
+}
+
 type Fixture = {
   home: string;
   away: string;
   stage: string;
-  daysFromNow: number;
+  daysFromStart: number;
 };
 
 function groupRoundRobinFixtures(
   groupLetter: string,
   teams: { name: string }[],
-  baseDaysFromNow: number
+  baseDaysFromStart: number
 ): Fixture[] {
   const fixtures: Fixture[] = [];
   let offset = 0;
@@ -103,7 +113,7 @@ function groupRoundRobinFixtures(
         home: teams[i].name,
         away: teams[j].name,
         stage: `Group ${groupLetter}`,
-        daysFromNow: baseDaysFromNow + offset,
+        daysFromStart: baseDaysFromStart + offset,
       });
       offset += 1;
     }
@@ -115,9 +125,8 @@ function buildGroupFixtures(): Fixture[] {
   const fixtures: Fixture[] = [];
   const letters = Object.keys(GROUPS).sort();
   letters.forEach((letter, groupIndex) => {
-    const baseDays = 30 + groupIndex * 4;
     fixtures.push(
-      ...groupRoundRobinFixtures(letter, GROUPS[letter], baseDays)
+      ...groupRoundRobinFixtures(letter, GROUPS[letter], groupIndex)
     );
   });
   return fixtures;
@@ -158,15 +167,12 @@ async function main() {
     const home = allTeams.find((t) => t.name === f.home);
     const away = allTeams.find((t) => t.name === f.away);
     if (!home || !away) continue;
-    const kickoffAt = new Date();
-    kickoffAt.setDate(kickoffAt.getDate() + f.daysFromNow);
-    kickoffAt.setHours(18, 0, 0, 0);
     await prisma.match.create({
       data: {
         homeTeamId: teamByCode[home.code],
         awayTeamId: teamByCode[away.code],
         stage: f.stage,
-        kickoffAt,
+        kickoffAt: daysAfterStart(f.daysFromStart, 18),
       },
     });
   }
@@ -178,16 +184,13 @@ async function main() {
       console.warn(`Skipping M${f.matchNumber}: missing slot team`);
       continue;
     }
-    const kickoffAt = new Date();
-    kickoffAt.setDate(kickoffAt.getDate() + f.daysFromNow);
-    kickoffAt.setHours(20, 0, 0, 0);
     await prisma.match.create({
       data: {
         matchNumber: f.matchNumber,
         homeTeamId: homeId,
         awayTeamId: awayId,
         stage: f.stage,
-        kickoffAt,
+        kickoffAt: daysAfterStart(f.daysFromStart, 20),
       },
     });
   }

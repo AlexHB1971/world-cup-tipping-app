@@ -21,6 +21,12 @@ type TournamentResult = {
   winner: string | null;
 } | null;
 
+function clampScore(raw: string): number {
+  const n = Number(raw);
+  if (!Number.isFinite(n)) return 0;
+  return Math.max(0, Math.min(20, Math.floor(n)));
+}
+
 export function AdminPanel({
   matches,
   teams,
@@ -31,16 +37,12 @@ export function AdminPanel({
   tournamentResult: TournamentResult;
 }) {
   const router = useRouter();
-  const [secret, setSecret] = useState("");
   const [message, setMessage] = useState<string | null>(null);
 
   async function saveMatch(matchId: string, homeScore: number, awayScore: number) {
     const res = await fetch("/api/admin/match-result", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-admin-secret": secret,
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ matchId, homeScore, awayScore }),
     });
     const data = await res.json().catch(() => ({}));
@@ -55,10 +57,7 @@ export function AdminPanel({
   async function saveTournament(form: Record<string, string>) {
     const res = await fetch("/api/admin/tournament-result", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-admin-secret": secret,
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form),
     });
     const data = await res.json().catch(() => ({}));
@@ -72,15 +71,15 @@ export function AdminPanel({
 
   return (
     <div>
-      <div className="card field">
-        <label>Admin secret</label>
-        <input
-          type="password"
-          value={secret}
-          onChange={(e) => setSecret(e.target.value)}
-          placeholder="ADMIN_SECRET from .env"
-        />
-      </div>
+      <form
+        action="/api/admin/logout"
+        method="post"
+        style={{ marginBottom: "1rem" }}
+      >
+        <button type="submit" className="btn secondary">
+          Log out of admin
+        </button>
+      </form>
       {message && (
         <div className={`message ${message.includes("saved") ? "success" : "error"}`}>
           {message}
@@ -120,16 +119,18 @@ function MatchResultRow({
         <input
           type="number"
           min={0}
+          max={20}
           value={home}
-          onChange={(e) => setHome(Number(e.target.value))}
+          onChange={(e) => setHome(clampScore(e.target.value))}
           style={{ width: 64 }}
         />
         :
         <input
           type="number"
           min={0}
+          max={20}
           value={away}
-          onChange={(e) => setAway(Number(e.target.value))}
+          onChange={(e) => setAway(clampScore(e.target.value))}
           style={{ width: 64 }}
         />
         <button className="btn secondary" onClick={() => onSave(match.id, home, away)}>

@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -14,8 +14,8 @@ model User {
   displayName  String?
   createdAt    DateTime @default(now())
 
-  matchPredictions      MatchPrediction[]
-  tournamentPrediction  TournamentPrediction?
+  matchPredictions     MatchPrediction[]
+  tournamentPrediction TournamentPrediction?
 }
 
 model Team {
@@ -28,23 +28,23 @@ model Team {
 }
 
 model Match {
-  id        String    @id @default(cuid())
-  homeTeamId String
-  awayTeamId String
-  matchNumber Int?    @unique
-  stage     String
-  kickoffAt DateTime
-  homeScore Int?
-  awayScore Int?
-  isLocked  Boolean   @default(false)
+  id          String   @id @default(cuid())
+  homeTeamId  String
+  awayTeamId  String
+  matchNumber Int?     @unique
+  stage       String
+  kickoffAt   DateTime
+  homeScore   Int?
+  awayScore   Int?
+  isLocked    Boolean  @default(false)
 
-  homeTeam Team @relation("HomeTeam", fields: [homeTeamId], references: [id])
-  awayTeam Team @relation("AwayTeam", fields: [awayTeamId], references: [id])
+  homeTeam    Team              @relation("HomeTeam", fields: [homeTeamId], references: [id])
+  awayTeam    Team              @relation("AwayTeam", fields: [awayTeamId], references: [id])
   predictions MatchPrediction[]
 }
 
 model MatchPrediction {
-  id        String @id @default(cuid())
+  id        String   @id @default(cuid())
   userId    String
   matchId   String
   homeScore Int
@@ -58,27 +58,27 @@ model MatchPrediction {
 }
 
 model TournamentPrediction {
-  id              String @id @default(cuid())
-  userId          String @unique
-  semiFinalist1   String
-  semiFinalist2   String
-  semiFinalist3   String
-  semiFinalist4   String
-  finalist1       String
-  finalist2       String
-  winner          String
-  updatedAt       DateTime @updatedAt
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  semiFinalist1 String
+  semiFinalist2 String
+  semiFinalist3 String
+  semiFinalist4 String
+  finalist1     String
+  finalist2     String
+  winner        String
+  updatedAt     DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model TournamentResult {
-  id              String @id @default("singleton")
-  semiFinalist1   String?
-  semiFinalist2   String?
-  semiFinalist3   String?
-  semiFinalist4   String?
-  finalist1       String?
-  finalist2       String?
-  winner          String?
+  id            String  @id @default("singleton")
+  semiFinalist1 String?
+  semiFinalist2 String?
+  semiFinalist3 String?
+  semiFinalist4 String?
+  finalist1     String?
+  finalist2     String?
+  winner        String?
 }

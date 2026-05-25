@@ -17,7 +17,7 @@ export function getMatchOutcome(home: number, away: number): "home" | "away" | "
   return "draw";
 }
 
-/** Best single tier: 5 exact, else 2 goal diff, else 1 winner. */
+/** Best single tier: 5 exact, else 2 goal diff, else 1 winner/draw. */
 export function scoreMatchPrediction(
   predictedHome: number,
   predictedAway: number,
@@ -28,7 +28,9 @@ export function scoreMatchPrediction(
 
   const predDiff = predictedHome - predictedAway;
   const actualDiff = actualHome - actualAway;
-  if (predDiff === actualDiff) return 2;
+  // Two non-exact draws would both match on diff (0 == 0). Treat that as a
+  // correct-draw (1 pt) rather than a free goal-diff tier (2 pts).
+  if (predDiff === actualDiff && predDiff !== 0) return 2;
 
   const predOutcome = getMatchOutcome(predictedHome, predictedAway);
   const actualOutcome = getMatchOutcome(actualHome, actualAway);

@@ -9,7 +9,8 @@ export type BracketFixture = {
   stage: string;
   homeSlot: string;
   awaySlot: string;
-  daysFromNow: number;
+  /** Days after TOURNAMENT_START (2026-06-11). */
+  daysFromStart: number;
 };
 
 /** Human-readable names for bracket slot codes stored as Team.code */
@@ -39,7 +40,7 @@ export const SLOT_LABELS: Record<string, string> = {
   "2K": "Runner-up Group K",
   "2L": "Runner-up Group L",
   "3ABCDF": "3rd (A/B/C/D/F)",
-  "3BCDFG": "3rd (C/D/F/G/H)",
+  "3BCDFG": "3rd (B/C/D/F/G)",
   "3CEFHI": "3rd (C/E/F/H/I)",
   "3EHIJK": "3rd (E/H/I/J/K)",
   "3BEFIJ": "3rd (B/E/F/I/J)",
@@ -81,43 +82,43 @@ export const SLOT_LABELS: Record<string, string> = {
 };
 
 export const KNOCKOUT_FIXTURES: BracketFixture[] = [
-  // Round of 32 (16) — June 28 – July 3
-  { matchNumber: 73, stage: "Round of 32", homeSlot: "2A", awaySlot: "2B", daysFromNow: 82 },
-  { matchNumber: 74, stage: "Round of 32", homeSlot: "1E", awaySlot: "3ABCDF", daysFromNow: 83 },
-  { matchNumber: 75, stage: "Round of 32", homeSlot: "1F", awaySlot: "2C", daysFromNow: 83 },
-  { matchNumber: 76, stage: "Round of 32", homeSlot: "1C", awaySlot: "2F", daysFromNow: 84 },
-  { matchNumber: 77, stage: "Round of 32", homeSlot: "1I", awaySlot: "3BCDFG", daysFromNow: 84 },
-  { matchNumber: 78, stage: "Round of 32", homeSlot: "2E", awaySlot: "2I", daysFromNow: 85 },
-  { matchNumber: 79, stage: "Round of 32", homeSlot: "1A", awaySlot: "3CEFHI", daysFromNow: 85 },
-  { matchNumber: 80, stage: "Round of 32", homeSlot: "1L", awaySlot: "3EHIJK", daysFromNow: 86 },
-  { matchNumber: 81, stage: "Round of 32", homeSlot: "1D", awaySlot: "3BEFIJ", daysFromNow: 86 },
-  { matchNumber: 82, stage: "Round of 32", homeSlot: "1G", awaySlot: "3AEHIJ", daysFromNow: 87 },
-  { matchNumber: 83, stage: "Round of 32", homeSlot: "2K", awaySlot: "2L", daysFromNow: 87 },
-  { matchNumber: 84, stage: "Round of 32", homeSlot: "1H", awaySlot: "2J", daysFromNow: 88 },
-  { matchNumber: 85, stage: "Round of 32", homeSlot: "1B", awaySlot: "3EFGIJ", daysFromNow: 88 },
-  { matchNumber: 86, stage: "Round of 32", homeSlot: "1J", awaySlot: "2H", daysFromNow: 89 },
-  { matchNumber: 87, stage: "Round of 32", homeSlot: "1K", awaySlot: "3DEIJL", daysFromNow: 89 },
-  { matchNumber: 88, stage: "Round of 32", homeSlot: "2D", awaySlot: "2G", daysFromNow: 90 },
-  // Round of 16 (8)
-  { matchNumber: 90, stage: "Round of 16", homeSlot: "W73", awaySlot: "W75", daysFromNow: 92 },
-  { matchNumber: 89, stage: "Round of 16", homeSlot: "W74", awaySlot: "W77", daysFromNow: 92 },
-  { matchNumber: 91, stage: "Round of 16", homeSlot: "W76", awaySlot: "W78", daysFromNow: 93 },
-  { matchNumber: 92, stage: "Round of 16", homeSlot: "W79", awaySlot: "W80", daysFromNow: 93 },
-  { matchNumber: 93, stage: "Round of 16", homeSlot: "W83", awaySlot: "W84", daysFromNow: 94 },
-  { matchNumber: 94, stage: "Round of 16", homeSlot: "W81", awaySlot: "W82", daysFromNow: 94 },
-  { matchNumber: 95, stage: "Round of 16", homeSlot: "W86", awaySlot: "W88", daysFromNow: 95 },
-  { matchNumber: 96, stage: "Round of 16", homeSlot: "W85", awaySlot: "W87", daysFromNow: 95 },
-  // Quarter-finals (4)
-  { matchNumber: 97, stage: "Quarter-final", homeSlot: "W89", awaySlot: "W90", daysFromNow: 98 },
-  { matchNumber: 98, stage: "Quarter-final", homeSlot: "W93", awaySlot: "W94", daysFromNow: 98 },
-  { matchNumber: 99, stage: "Quarter-final", homeSlot: "W91", awaySlot: "W92", daysFromNow: 99 },
-  { matchNumber: 100, stage: "Quarter-final", homeSlot: "W95", awaySlot: "W96", daysFromNow: 99 },
-  // Semi-finals (2)
-  { matchNumber: 101, stage: "Semi-final", homeSlot: "W97", awaySlot: "W98", daysFromNow: 102 },
-  { matchNumber: 102, stage: "Semi-final", homeSlot: "W99", awaySlot: "W100", daysFromNow: 103 },
-  // Third place & Final
-  { matchNumber: 103, stage: "Third-place play-off", homeSlot: "L101", awaySlot: "L102", daysFromNow: 106 },
-  { matchNumber: 104, stage: "Final", homeSlot: "W101", awaySlot: "W102", daysFromNow: 107 },
+  // Round of 32 (16) — June 28 – July 3, 2026
+  { matchNumber: 73, stage: "Round of 32", homeSlot: "2A", awaySlot: "2B", daysFromStart: 17 },
+  { matchNumber: 74, stage: "Round of 32", homeSlot: "1E", awaySlot: "3ABCDF", daysFromStart: 17 },
+  { matchNumber: 75, stage: "Round of 32", homeSlot: "1F", awaySlot: "2C", daysFromStart: 18 },
+  { matchNumber: 76, stage: "Round of 32", homeSlot: "1C", awaySlot: "2F", daysFromStart: 18 },
+  { matchNumber: 77, stage: "Round of 32", homeSlot: "1I", awaySlot: "3BCDFG", daysFromStart: 19 },
+  { matchNumber: 78, stage: "Round of 32", homeSlot: "2E", awaySlot: "2I", daysFromStart: 19 },
+  { matchNumber: 79, stage: "Round of 32", homeSlot: "1A", awaySlot: "3CEFHI", daysFromStart: 19 },
+  { matchNumber: 80, stage: "Round of 32", homeSlot: "1L", awaySlot: "3EHIJK", daysFromStart: 20 },
+  { matchNumber: 81, stage: "Round of 32", homeSlot: "1D", awaySlot: "3BEFIJ", daysFromStart: 20 },
+  { matchNumber: 82, stage: "Round of 32", homeSlot: "1G", awaySlot: "3AEHIJ", daysFromStart: 21 },
+  { matchNumber: 83, stage: "Round of 32", homeSlot: "2K", awaySlot: "2L", daysFromStart: 21 },
+  { matchNumber: 84, stage: "Round of 32", homeSlot: "1H", awaySlot: "2J", daysFromStart: 22 },
+  { matchNumber: 85, stage: "Round of 32", homeSlot: "1B", awaySlot: "3EFGIJ", daysFromStart: 22 },
+  { matchNumber: 86, stage: "Round of 32", homeSlot: "1J", awaySlot: "2H", daysFromStart: 22 },
+  { matchNumber: 87, stage: "Round of 32", homeSlot: "1K", awaySlot: "3DEIJL", daysFromStart: 23 },
+  { matchNumber: 88, stage: "Round of 32", homeSlot: "2D", awaySlot: "2G", daysFromStart: 23 },
+  // Round of 16 (8) — July 4 – 7, 2026
+  { matchNumber: 90, stage: "Round of 16", homeSlot: "W73", awaySlot: "W75", daysFromStart: 24 },
+  { matchNumber: 89, stage: "Round of 16", homeSlot: "W74", awaySlot: "W77", daysFromStart: 24 },
+  { matchNumber: 91, stage: "Round of 16", homeSlot: "W76", awaySlot: "W78", daysFromStart: 25 },
+  { matchNumber: 92, stage: "Round of 16", homeSlot: "W79", awaySlot: "W80", daysFromStart: 25 },
+  { matchNumber: 93, stage: "Round of 16", homeSlot: "W83", awaySlot: "W84", daysFromStart: 26 },
+  { matchNumber: 94, stage: "Round of 16", homeSlot: "W81", awaySlot: "W82", daysFromStart: 26 },
+  { matchNumber: 95, stage: "Round of 16", homeSlot: "W86", awaySlot: "W88", daysFromStart: 27 },
+  { matchNumber: 96, stage: "Round of 16", homeSlot: "W85", awaySlot: "W87", daysFromStart: 27 },
+  // Quarter-finals (4) — July 9 – 11, 2026
+  { matchNumber: 97, stage: "Quarter-final", homeSlot: "W89", awaySlot: "W90", daysFromStart: 29 },
+  { matchNumber: 98, stage: "Quarter-final", homeSlot: "W93", awaySlot: "W94", daysFromStart: 29 },
+  { matchNumber: 99, stage: "Quarter-final", homeSlot: "W91", awaySlot: "W92", daysFromStart: 30 },
+  { matchNumber: 100, stage: "Quarter-final", homeSlot: "W95", awaySlot: "W96", daysFromStart: 30 },
+  // Semi-finals (2) — July 14 – 15, 2026
+  { matchNumber: 101, stage: "Semi-final", homeSlot: "W97", awaySlot: "W98", daysFromStart: 33 },
+  { matchNumber: 102, stage: "Semi-final", homeSlot: "W99", awaySlot: "W100", daysFromStart: 34 },
+  // Third place & Final — July 18 – 19, 2026
+  { matchNumber: 103, stage: "Third-place play-off", homeSlot: "L101", awaySlot: "L102", daysFromStart: 37 },
+  { matchNumber: 104, stage: "Final", homeSlot: "W101", awaySlot: "W102", daysFromStart: 38 },
 ];
 
 export function allBracketSlotCodes(): string[] {
@@ -127,4 +128,15 @@ export function allBracketSlotCodes(): string[] {
     codes.add(f.awaySlot);
   }
   return [...codes];
+}
+
+const BRACKET_SLOT_CODE_SET = new Set(allBracketSlotCodes());
+
+export function isBracketSlotCode(code: string): boolean {
+  return BRACKET_SLOT_CODE_SET.has(code);
+}
+
+/** Filter out bracket-slot placeholders, leaving only real national teams. */
+export function filterRealTeams<T extends { code: string }>(teams: T[]): T[] {
+  return teams.filter((t) => !BRACKET_SLOT_CODE_SET.has(t.code));
 }

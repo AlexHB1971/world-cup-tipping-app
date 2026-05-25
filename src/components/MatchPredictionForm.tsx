@@ -22,6 +22,12 @@ const STAGE_ORDER = [
   ...KNOCKOUT_STAGES,
 ];
 
+function clampScore(raw: string): number {
+  const n = Number(raw);
+  if (!Number.isFinite(n)) return 0;
+  return Math.max(0, Math.min(20, Math.floor(n)));
+}
+
 export function MatchPredictionForm({ matches }: { matches: MatchRow[] }) {
   const router = useRouter();
   const [message, setMessage] = useState<string | null>(null);
@@ -44,9 +50,12 @@ export function MatchPredictionForm({ matches }: { matches: MatchRow[] }) {
     });
     return stages.map((stage) => ({
       stage,
-      matches: (map.get(stage) ?? []).sort(
-        (a, b) => (a.matchNumber ?? 0) - (b.matchNumber ?? 0)
-      ),
+      matches: (map.get(stage) ?? []).sort((a, b) => {
+        const ka = new Date(a.kickoffAt).getTime();
+        const kb = new Date(b.kickoffAt).getTime();
+        if (ka !== kb) return ka - kb;
+        return (a.matchNumber ?? 0) - (b.matchNumber ?? 0);
+      }),
     }));
   }, [matches]);
 
@@ -146,7 +155,7 @@ function MatchCard({
           max={20}
           value={home}
           disabled={locked}
-          onChange={(e) => setHome(Number(e.target.value))}
+          onChange={(e) => setHome(clampScore(e.target.value))}
           style={{ width: 64 }}
           aria-label={`${match.homeTeam.name} goals`}
         />
@@ -157,7 +166,7 @@ function MatchCard({
           max={20}
           value={away}
           disabled={locked}
-          onChange={(e) => setAway(Number(e.target.value))}
+          onChange={(e) => setAway(clampScore(e.target.value))}
           style={{ width: 64 }}
           aria-label={`${match.awayTeam.name} goals`}
         />

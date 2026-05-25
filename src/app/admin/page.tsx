@@ -1,10 +1,19 @@
-import { allBracketSlotCodes } from "@/data/knockout-bracket";
+import { filterRealTeams } from "@/data/knockout-bracket";
+import { AdminLogin } from "@/components/AdminLogin";
 import { AdminPanel } from "@/components/AdminPanel";
+import { isAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-const BRACKET_SLOT_CODES = new Set(allBracketSlotCodes());
-
 export default async function AdminPage() {
+  if (!(await isAdmin())) {
+    return (
+      <div>
+        <h2>Admin</h2>
+        <AdminLogin />
+      </div>
+    );
+  }
+
   const [matches, teams, tournamentResult] = await Promise.all([
     prisma.match.findMany({
       orderBy: { kickoffAt: "asc" },
@@ -18,8 +27,7 @@ export default async function AdminPage() {
     <div>
       <h2>Admin</h2>
       <p style={{ color: "var(--muted)" }}>
-        Enter actual results to update scores. Set{" "}
-        <code>ADMIN_SECRET</code> in your environment and use it below.
+        Enter actual results to update scores.
       </p>
       <AdminPanel
         matches={matches.map((m) => ({
@@ -29,9 +37,7 @@ export default async function AdminPage() {
           homeScore: m.homeScore,
           awayScore: m.awayScore,
         }))}
-        teams={teams
-          .filter((t) => !BRACKET_SLOT_CODES.has(t.code))
-          .map((t) => t.name)}
+        teams={filterRealTeams(teams).map((t) => t.name)}
         tournamentResult={tournamentResult}
       />
     </div>
