@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { filterRealTeams } from "@/data/knockout-bracket";
 import { getSessionUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { arePredictionsLocked } from "@/lib/world-cup-format";
 
 const FIELDS = [
   "semiFinalist1",
@@ -19,13 +20,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
-  const firstMatch = await prisma.match.findFirst({
-    orderBy: { kickoffAt: "asc" },
-    select: { kickoffAt: true },
-  });
-  if (firstMatch && firstMatch.kickoffAt <= new Date()) {
+  if (arePredictionsLocked()) {
     return NextResponse.json(
-      { error: "Tournament predictions are locked — the World Cup has started" },
+      { error: "Tournament predictions are locked — the World Cup starts in under 24 hours" },
       { status: 403 }
     );
   }

@@ -3,6 +3,18 @@
  * @see https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/groups-how-teams-qualify-tie-breakers
  */
 
+/** Opening match of the 2026 FIFA World Cup (kept in sync with prisma/seed.ts). */
+export const TOURNAMENT_START = new Date("2026-06-11T18:00:00Z");
+
+/** All predictions (match + tournament) lock 24 hours before the opening match. */
+export const PREDICTIONS_LOCK_AT = new Date(
+  TOURNAMENT_START.getTime() - 24 * 60 * 60 * 1000
+);
+
+export function arePredictionsLocked(now: Date = new Date()): boolean {
+  return now >= PREDICTIONS_LOCK_AT;
+}
+
 export const GROUP_POINTS = { win: 3, draw: 1, loss: 0 } as const;
 
 /** Order for separating teams on equal points (FIFA group stage). */

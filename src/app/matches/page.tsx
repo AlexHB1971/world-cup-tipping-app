@@ -1,7 +1,9 @@
 import { redirect } from "next/navigation";
+import { LockoutTicker } from "@/components/LockoutTicker";
 import { MatchPredictionForm } from "@/components/MatchPredictionForm";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { arePredictionsLocked } from "@/lib/world-cup-format";
 
 export default async function MatchesPage() {
   const user = await getCurrentUser();
@@ -16,6 +18,9 @@ export default async function MatchesPage() {
     },
   });
 
+  const now = new Date();
+  const lockedGlobal = arePredictionsLocked(now);
+
   const rows = matches.map((m) => ({
     id: m.id,
     stage: m.stage,
@@ -25,7 +30,7 @@ export default async function MatchesPage() {
     awayTeam: { name: m.awayTeam.name, code: m.awayTeam.code },
     homeScore: m.homeScore,
     awayScore: m.awayScore,
-    isLocked: m.isLocked || m.kickoffAt <= new Date(),
+    isLocked: m.isLocked || lockedGlobal || m.kickoffAt <= now,
     prediction: m.predictions[0]
       ? { homeScore: m.predictions[0].homeScore, awayScore: m.predictions[0].awayScore }
       : null,
@@ -33,9 +38,10 @@ export default async function MatchesPage() {
 
   return (
     <div>
+      <LockoutTicker />
       <h2>Match predictions</h2>
       <p style={{ color: "var(--muted)" }}>
-        Submit scores before kickoff. Locked matches cannot be changed.
+        Submit scores before the tournament-wide lockout (1 day before kick-off).
       </p>
       <MatchPredictionForm matches={rows} />
     </div>

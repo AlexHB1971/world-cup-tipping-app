@@ -1,11 +1,19 @@
 import { NextResponse } from "next/server";
 import { getSessionUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { arePredictionsLocked } from "@/lib/world-cup-format";
 
 export async function POST(request: Request) {
   const userId = await getSessionUserId();
   if (!userId) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  }
+
+  if (arePredictionsLocked()) {
+    return NextResponse.json(
+      { error: "Predictions are locked — the World Cup starts in under 24 hours" },
+      { status: 403 }
+    );
   }
 
   const body = await request.json();
