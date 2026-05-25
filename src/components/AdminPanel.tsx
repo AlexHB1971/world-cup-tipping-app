@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 type UserItem = {
@@ -52,10 +52,36 @@ export function AdminPanel({
   const router = useRouter();
   const [message, setMessage] = useState<string | null>(null);
   const [busyUserId, setBusyUserId] = useState<string | null>(null);
+  const [syncing, setSyncing] = useState(false);
+  const [syncSummary, setSyncSummary] = useState<string | null>(null);
+  const autoSyncedRef = useRef(false);
 
   function showResult(ok: boolean, error: string | undefined, success: string) {
     setMessage(ok ? success : error ?? "Action failed");
   }
+
+  async function syncFifa(): Promise<boolean> {
+    setSyncing(true);
+    const res = await fetch("/api/admin/sync-fifa", { method: "POST" });
+    const data = await res.json().catch(() => ({}));
+    setSyncing(false);
+    if (!res.ok) {
+      setSyncSummary(`Sync failed: ${data.error ?? res.statusText}`);
+      return false;
+    }
+    setSyncSummary(
+      `Synced ${data.updated} of ${data.localMatches} (unchanged ${data.unchanged}, unmatched ${data.unmatched}).`
+    );
+    if (data.updated > 0) router.refresh();
+    return true;
+  }
+
+  useEffect(() => {
+    if (autoSyncedRef.current) return;
+    autoSyncedRef.current = true;
+    syncFifa();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function toggleAdmin(target: UserItem) {
     setBusyUserId(target.id);
@@ -201,7 +227,29 @@ export function AdminPanel({
         </table>
       </div>
 
-      <h3 style={{ marginTop: "2rem" }}>Match results</h3>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          flexWrap: "wrap",
+          gap: "0.5rem",
+          marginTop: "2rem",
+        }}
+      >
+        <h3 style={{ margin: 0 }}>Match results</h3>
+        <button
+          className="btn secondary"
+          onClick={syncFifa}
+          disabled={syncing}
+          title="Pull live scores from football-data.org"
+        >
+          {syncing ? "Syncing…" : "🔄 Sync from FIFA"}
+        </button>
+      </div>
+      {syncSummary && (
+        <p style={{ color: "var(--muted)", margin: "0.4rem 0 0.75rem" }}>{syncSummary}</p>
+      )}
       {matches.map((m) => (
         <MatchResultRow key={m.id} match={m} onSave={saveMatch} />
       ))}
