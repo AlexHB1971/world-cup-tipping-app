@@ -74,7 +74,6 @@ Edit `.env`:
 ```
 DATABASE_URL="postgresql://worldcup:PASSWORD@localhost:5432/worldcup"
 SESSION_SECRET="<openssl rand -hex 32>"
-ADMIN_SECRET="<openssl rand -hex 32>"
 ```
 
 ## 5. Install, push schema, seed, build
@@ -87,6 +86,18 @@ npm run build
 ```
 
 Sanity check: `npm test` should print "All scoring tests passed."
+
+## 5b. Bootstrap the first admin
+
+Admin is granted per-user via the `User.isAdmin` column. Register your own
+account through the website, then promote it via psql:
+
+```bash
+sudo -u postgres psql worldcup -c \
+  "UPDATE \"User\" SET \"isAdmin\" = true WHERE \"displayName\" = 'your-handle';"
+```
+
+From then on, that user can manage admins and delete other users from `/admin`.
 
 ## 6. systemd service
 
@@ -189,7 +200,7 @@ sudo systemctl restart worldcup
 
 ## 11. Record results in production
 
-Visit `https://your-domain.example.com/admin`, paste your `ADMIN_SECRET` (sets a JWT cookie good for 1 day), and enter match and tournament results as they happen. The leaderboard updates immediately.
+Visit `https://your-domain.example.com/admin` while logged in as your bootstrapped admin user. From there you can promote/demote other users, delete accounts, and enter match and tournament results. The leaderboard updates immediately.
 
 ---
 
@@ -225,7 +236,7 @@ If you'd rather not run a server, the original deployment target works too:
    ```
    and set `DIRECT_URL` to the **Direct connection** URL (port 5432).
 4. Locally: `npm install && npm run db:push && npm run db:seed`.
-5. Push the repo to GitHub. Sign in at [vercel.com](https://vercel.com) → Add New → Project → import the repo. Add `DATABASE_URL`, `DIRECT_URL`, `SESSION_SECRET`, `ADMIN_SECRET` as environment variables. Deploy.
+5. Push the repo to GitHub. Sign in at [vercel.com](https://vercel.com) → Add New → Project → import the repo. Add `DATABASE_URL`, `DIRECT_URL`, and `SESSION_SECRET` as environment variables. Deploy.
 6. The site is live at `https://<project>.vercel.app`. Push to `master` to redeploy.
 
 Supabase pauses inactive free-tier projects after ~7 days — reactivate with one click, no data loss.

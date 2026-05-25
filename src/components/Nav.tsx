@@ -1,7 +1,12 @@
 import Link from "next/link";
 
 type NavProps = {
-  user: { id: string; email: string; displayName: string | null } | null;
+  user: {
+    id: string;
+    email: string;
+    displayName: string | null;
+    isAdmin: boolean;
+  } | null;
 };
 
 export function Nav({ user }: NavProps) {
@@ -17,6 +22,7 @@ export function Nav({ user }: NavProps) {
         )}
         <Link href="/format">Format</Link>
         <Link href="/leaderboard">Leaderboard</Link>
+        {user?.isAdmin && <Link href="/admin">Admin</Link>}
         {user ? (
           <form action="/api/auth/logout" method="post">
             <button type="submit" className="btn secondary" style={{ padding: "0.35rem 0.75rem" }}>

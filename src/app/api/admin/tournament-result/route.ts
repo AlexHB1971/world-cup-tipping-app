@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { filterRealTeams } from "@/data/knockout-bracket";
-import { isAdmin } from "@/lib/auth";
+import { currentUserIsAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 export async function POST(request: Request) {
-  if (!(await isAdmin())) {
+  if (!(await currentUserIsAdmin())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

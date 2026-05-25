@@ -39,7 +39,7 @@ The database is seeded with all **48 official 2026 teams** (groups A–L), **72 
 
 ## Admin
 
-Visit `/admin` and enter your `ADMIN_SECRET` to record real match and tournament results. This unlocks leaderboard scoring.
+Visit `/admin` to record real match and tournament results and manage other users. Admin is per-user — see `DEPLOY.md` for how to promote your first user.
 
 ## Stack
 
